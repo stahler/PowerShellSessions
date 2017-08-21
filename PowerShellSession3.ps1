@@ -86,7 +86,7 @@ Get-Content C:\TEMP\ip.txt | ForEach-Object {
 # filtering via email address
 Get-Content -Path C:\TEMP\mail.txt | ForEach-Object {Get-ADuser -Filter {mail -eq $psitem}}
 
-# Tricky one....
+# Tricky one.....
 # Getting last bad password date (Will explain during session)
 (Get-ADDomainController -Filter *).Name | ForEach-Object {
         Get-ADUser stah06 -Server $PSItem -Properties LastBadPasswordAttempt |
@@ -106,4 +106,5 @@ Get-ADComputer -Filter { operatingSystem -like '*Window*Server*' } -Properties O
 Group-Object OperatingSystem -NoElement | Sort-Object Count -Descending |
 Select-Object @{ N = ”OpertaingSystem”; E = { $_.Name } }, Count,
        @{ N = ”Count%”; E = { "{0:%##}" -f $($_.Count/$s.Count) } },
-       @{ N = ”Histogram”; E = { “▄” * [int]($($_.Count/$s.Count) * 100) } } | Out-GridView
+       @{ N = ”Histogram”; E = { “▄” * [int]($($_.Count/$s.Count) * 100) } } |
+       Out-GridView
