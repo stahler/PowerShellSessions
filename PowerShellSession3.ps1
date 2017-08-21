@@ -80,7 +80,7 @@ Where-Object {-not $_.Members} | Select-Object Name, samAccountName, Description
 # filtering with a text file of IP addresses
 Get-Content C:\TEMP\ip.txt | ForEach-Object {
         Get-ADComputer -Filter {ipv4address -eq $_} -Properties Operatingsystem |
-        Select-Object name, Operatingsystem
+        Select-Object Name, Operatingsystem
 }
 
 # filtering via email address
