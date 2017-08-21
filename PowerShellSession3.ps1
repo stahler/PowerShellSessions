@@ -1,18 +1,23 @@
 Break # Do this to keep from running all commands below at once
 
+########################################################################################
 # Active Directory session
 # Assuming that everyone has RSAT installed so they can use the Active Directory Module
 # Test this by running: Get-ADUser kast04
+########################################################################################
 
+########################################################################################
 # Slight review from previous session
 Get-Command -Module ActiveDirectory | Measure-Object
 Get-Command -Module ActiveDirectory -Verb Get
 Get-Command -Module ActiveDirectory -Noun ADUser
 
+########################################################################################
 # Start off with some simple Gets (Sets will come later)
 # Notice that you only get a few attributes?
 Get-ADUser kast04
 
+########################################################################################
 # Same with Computers and Users
 Get-ADComputer SEC-SCRIPT-VT01
 Get-ADGroup ITSecurity
@@ -21,6 +26,7 @@ Get-ADGroup ITSecurity
 Get-ADUser kast04 -Properties *
 Get-ADUser kast04 -Properties LastBadPasswordAttempt, LastLogonDate, PasswordLastSet
 
+########################################################################################
 # Filtering
 Get-ADUser -Filter {samaccountname -like 'stah0*'} | Select-Object name, samaccountname
 Get-ADUser -Filter {surname -like 'stah*' -AND samaccountname -like 'stah0*'} | Select-Object name, samaccountname
@@ -42,6 +48,7 @@ Get-ADUser -Filter * -SearchBase 'OU=Disabled,DC=OSUMC,DC=EDU' |
 Where-Object SamAccountName -notmatch $regex |
 Select-Object SamAccountName, Name
 
+########################################################################################
 # Sorting, Grouping and Exporting
 Get-ADComputer -filter * -SearchBase 'OU=Citrix,DC=OSUMC,DC=EDU' |
 Sort-Object Name | Select-Object Name
@@ -56,11 +63,13 @@ Get-ADComputer -Filter * -Properties OperatingSystem |
 Group-Object -Property OperatingSystem -NoElement |
 Sort-Object -Property Count -Descending
 
+########################################################################################
 # Search-ADAccount examples
 Search-ADAccount -LockedOut -UsersOnly
 Search-ADAccount -AccountExpired | Get-ADUser
 Search-ADAccount -PasswordExpired -UsersOnly -Credential 'osumc\adm-wes'
 
+########################################################################################
 # Other common examples
 # Get Groups that are sam for two users
 $user1 = (Get-ADPrincipalGroupMembership gard26 | Sort-Object samAccountName).SamAccountName
