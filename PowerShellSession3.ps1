@@ -61,7 +61,6 @@ Search-ADAccount -LockedOut -UsersOnly
 Search-ADAccount -AccountExpired | Get-ADUser
 Search-ADAccount -PasswordExpired -UsersOnly -Credential 'osumc\adm-wes'
 
-
 # Other common examples
 # Get Groups that are sam for two users
 $user1 = (Get-ADPrincipalGroupMembership gard26 | Sort-Object samAccountName).SamAccountName
