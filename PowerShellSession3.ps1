@@ -120,4 +120,3 @@ $group = 'lsa-ii-nilcv-vp02'
     Get-ADUser |
     Where-Object samaccountname -Match $regex |
     Select-Object samaccountname
-
