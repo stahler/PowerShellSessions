@@ -108,3 +108,16 @@ Select-Object @{ N = ”OpertaingSystem”; E = { $_.Name } }, Count,
        @{ N = ”Count%”; E = { "{0:%##}" -f $($_.Count/$s.Count) } },
        @{ N = ”Histogram”; E = { “▄” * [int]($($_.Count/$s.Count) * 100) } } |
        Out-GridView
+
+# Looking for mortal accounts that have are in the local adminstrators group
+# Regex to find "human" non-elevated accounts
+$regex = '^[a-z]{4}\d{2}$|^[a-z]{3}\d{2,3}$|^[a-z]{2}\d{2,4}$'
+
+# Group we wish to interogate
+$group = 'lsa-ii-nilcv-vp02'
+
+((Get-ADGroup $group -Properties members).members | Get-ADGroup -Properties members).members |
+    Get-ADUser |
+    Where-Object samaccountname -Match $regex |
+    Select-Object samaccountname
+
