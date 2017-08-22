@@ -16,11 +16,9 @@ Get-Command -Module ActiveDirectory -Noun ADUser
 # Start off with some simple Gets (Sets will come later)
 # Notice that you only get a few attributes?
 Get-ADUser kast04
-
-########################################################################################
-# Same with Computers and Users
 Get-ADComputer SEC-SCRIPT-VT01
 Get-ADGroup ITSecurity
+'Network Team','Office for Scholarship' | Get-ADGroup
 
 # Lets get more info! MSFT returns a small subset of attributes
 Get-ADUser kast04 -Properties *
@@ -28,19 +26,26 @@ Get-ADUser kast04 -Properties LastBadPasswordAttempt, LastLogonDate, PasswordLas
 
 ########################################################################################
 # Filtering
-Get-ADUser -Filter {samaccountname -like 'stah0*'} | Select-Object name, samaccountname
-Get-ADUser -Filter {surname -like 'stah*' -AND samaccountname -like 'stah0*'} | Select-Object name, samaccountname
+Get-ADUser -Filter {samaccountname -like 'stah0*'} |
+Select-Object Name, samaccountname
+
+Get-ADUser -Filter {surname -like 'stah*' -AND samaccountname -like 'stah0*'} |
+Select-Object Name, samaccountname
 
 # LDAPFilter (Old school)
 $LDAP = "(&(Description=*test account*)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"
-Get-ADUser -LDAPFilter $ldap | Select-Object name, samaccountname, enabled
+Get-ADUser -LDAPFilter $ldap |
+Select-Object Name, samaccountname, enabled
 
 # Sometimes you can't use the filter parameter (or being lazy).
-Get-ADUser -Filter * | Where-Object enabled -eq $false | Measure-Command
+Get-ADUser -Filter * |
+Where-Object enabled -eq $false |
+Measure-Command
 
 # Better example (Getting "human users")
 $regex = '^[a-z]{4}\d{2}$|^[a-z]{3}\d{2,3}$|^[a-z]{2}\d{2,4}$'
-Get-ADUser -Filter * | Where-Object samaccountname -Match $regex |
+Get-ADUser -Filter * |
+Where-Object samaccountname -Match $regex |
 Select-Object samaccountname, name
 
 # Another example finding all non-human users but this time, just looking in a particular OU
@@ -51,7 +56,8 @@ Select-Object SamAccountName, Name
 ########################################################################################
 # Sorting, Grouping and Exporting
 Get-ADComputer -filter * -SearchBase 'OU=Citrix,DC=OSUMC,DC=EDU' |
-Sort-Object Name | Select-Object Name
+Sort-Object Name |
+Select-Object Name
 
 Get-ADComputer -filter * -SearchBase 'OU=Citrix,DC=OSUMC,DC=EDU' -properties OperatingSystem |
 Sort-Object Name |
@@ -84,7 +90,9 @@ Out-GridView -Title "Groups that Brett has, that Wes doesnt"
 
 # Get empty groups
 Get-ADGroup -Filter {GroupCategory -eq 'Distribution'} -Properties members, description, managedby |
-Where-Object {-not $_.Members} | Select-Object Name, samAccountName, Description, managedby | Out-GridView
+Where-Object {-not $_.Members} |
+Select-Object Name, samAccountName, Description, managedby |
+Out-GridView -Title "These be empty groups"
 
 # filtering with a text file of IP addresses
 Get-Content C:\TEMP\ip.txt | ForEach-Object {
@@ -93,13 +101,17 @@ Get-Content C:\TEMP\ip.txt | ForEach-Object {
 }
 
 # filtering via email address
-Get-Content -Path C:\TEMP\mail.txt | ForEach-Object {Get-ADuser -Filter {mail -eq $psitem}}
+Get-Content -Path C:\TEMP\mail.txt |
+ForEach-Object {
+    Get-ADuser -Filter {mail -eq $psitem}
+}
 
 # Tricky one.....
 # Getting last bad password date (Will explain during session)
-(Get-ADDomainController -Filter *).Name | ForEach-Object {
-        Get-ADUser stah06 -Server $PSItem -Properties LastBadPasswordAttempt |
-        Select-Object LastBadPasswordAttempt
+(Get-ADDomainController -Filter *).Name |
+ForEach-Object {
+    Get-ADUser stah06 -Server $PSItem -Properties LastBadPasswordAttempt |
+    Select-Object LastBadPasswordAttempt
 }
 
 # Fancy manager report
