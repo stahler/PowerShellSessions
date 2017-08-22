@@ -19,10 +19,9 @@ Get-ADComputer 'SEC-SCRIPT-VT01'
 
 Get-Content ./servers.txt | Get-ADComputer
 
-Import-Csv -Path ./itsecurity.csv |
-Select-Object -ExpandProperty samAccountName |
-Get-ADUser # or (I typically do it this way)
+Import-Csv -Path ./itsecurity.csv | Select-Object -ExpandProperty samAccountName | Get-ADUser
 
+# or (I typically do it this way)
 (Import-Csv ./itsecurity.csv).samAccountName | Get-ADUser
 
 Get-ADGroup ITSecurity
@@ -33,6 +32,7 @@ Get-ADGroup ITSecurity
 Get-ADUser kast04 -Properties *
 
 Get-ADUser kast04 -Properties LastBadPasswordAttempt, LastLogonDate, PasswordLastSet
+
 Get-ADUser kast04 -Properties LastBadPasswordAttempt, LastLogonDate, PasswordLastSet |
 Select-Object Name, LastBadPasswordAttempt, LastLogonDate, PasswordLastSet
 
@@ -129,22 +129,27 @@ ForEach-Object {
     Select-Object LastBadPasswordAttempt
 }
 
+#################################################################################################
 # Fancy manager report
+# also an example of a computed column, calculated property, custom field, so many names....
+# also shows how to grab a particular value from an array
 Get-ADUser -Filter * -Properties DepartmentNumber, Manager, Department, DisplayName |
 Where-Object {$PSItem.DepartmentNumber[0] -eq '92274' -AND $PSItem.Enabled -eq $true} |
 Select-Object DisplayName, samaccountname, department, Manager,
-    @{N='CC';E={$PSItem.DepartmentNumber[0]}},
-    @{N='ManagerID';E={(Get-ADUser $PSItem.manager).samaccountname}} |
+@{Name = 'CC';Expression = {$PSItem.DepartmentNumber[0]}},
+@{N='ManagerID';E={(Get-ADUser $PSItem.manager).samaccountname}} |
 Out-GridView -Title "92274 Employees"
 
+###################################################################################################
 # Poor mans histogram
 Get-ADComputer -Filter { operatingSystem -like '*Window*Server*' } -Properties OperatingSystem -OutVariable s |
-Group-Object OperatingSystem -NoElement | Sort-Object Count -Descending |
+Group-Object OperatingSystem -NoElement | Sort-Object -Property Count -Descending |
 Select-Object @{ N = ”OpertaingSystem”; E = { $_.Name } }, Count,
        @{ N = ”Count%”; E = { "{0:%##}" -f $($_.Count/$s.Count) } },
        @{ N = ”Histogram”; E = { “▄” * [int]($($_.Count/$s.Count) * 100) } } |
        Out-GridView
 
+###################################################################################################
 # Looking for mortal accounts that have are in the local adminstrators group
 # Regex to find "human" non-elevated accounts
 $regex = '^[a-z]{4}\d{2}$|^[a-z]{3}\d{2,3}$|^[a-z]{2}\d{2,4}$'
@@ -156,3 +161,8 @@ $group = 'lsa-ii-nilcv-vp02'
     Get-ADUser |
     Where-Object samaccountname -Match $regex |
     Select-Object samaccountname
+
+# Bonus tip
+# Get-Clipboard example
+
+# Questions?
