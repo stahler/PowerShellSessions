@@ -1,10 +1,9 @@
-Break # Do this to keep from running all commands below at once
-
 ########################################################################################
 # Active Directory session
 # Assuming that everyone has RSAT installed so they can use the Active Directory Module
 # Test this by running: Get-ADUser kast04
 ########################################################################################
+Break # Do this to keep from running all commands below at once
 
 ########################################################################################
 # Slight review from previous session
@@ -14,23 +13,28 @@ Get-Command -Module ActiveDirectory -Noun ADUser
 
 ########################################################################################
 # Start off with some simple Gets (Sets will come later)
-# Notice that you only get a few attributes?
 Get-ADUser kast04
-Get-ADUser kast04
+
+Get-ADComputer 'SEC-SCRIPT-VT01'
+
+Get-Content ./servers.txt | Get-ADComputer
 
 Import-Csv -Path ./itsecurity.csv |
 Select-Object -ExpandProperty samAccountName |
 Get-ADUser # or (I typically do it this way)
+
 (Import-Csv ./itsecurity.csv).samAccountName | Get-ADUser
 
-Get-ADComputer 'SEC-SCRIPT-VT01'
-Get-Content ./servers.txt | Get-ADComputer
 Get-ADGroup ITSecurity
 'Network Team','Office for Scholarship' | Get-ADGroup
 
-# Lets get more info! MSFT returns a small subset of attributes
+# Lets get more info!
+# PowerShell by default returns a small subset of attributes
 Get-ADUser kast04 -Properties *
+
 Get-ADUser kast04 -Properties LastBadPasswordAttempt, LastLogonDate, PasswordLastSet
+Get-ADUser kast04 -Properties LastBadPasswordAttempt, LastLogonDate, PasswordLastSet |
+Select-Object Name, LastBadPasswordAttempt, LastLogonDate, PasswordLastSet
 
 ########################################################################################
 # Filtering
@@ -39,6 +43,9 @@ Select-Object Name, samaccountname
 
 Get-ADUser -Filter {surname -like 'stah*' -AND samaccountname -like 'stah0*'} |
 Select-Object Name, samaccountname
+
+Get-ADUser -Filter {Department -eq 'Data Security (92274)'} -Properties DisplayName |
+Select-Object SamAccountName, DisplayName
 
 # LDAPFilter (Old school)
 $LDAP = "(&(Description=*test account*)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"
