@@ -107,6 +107,10 @@ Compare-Object $user1 $user2 | Where-Object SideIndicator -eq "<=" |
 Out-GridView -Title "Groups that Brett has, that Wes doesnt"
 
 # Get empty groups
+Get-ADGroup -Filter {GroupCategory -eq 'Distribution'} -Properties members |
+Where-Object {($_.Members | Measure-Object).count -eq 0} | Measure-Object
+
+# or another way
 Get-ADGroup -Filter {GroupCategory -eq 'Distribution'} -Properties members, description, managedby |
 Where-Object {-not $_.Members} | Select-Object Name, samAccountName, Description, managedby |
 Out-GridView -Title "These be empty groups"
@@ -161,5 +165,10 @@ $group = 'lsa-ii-nilcv-vp02'
 
 # Bonus tip
 # Get-Clipboard example
+
+# Test time:
+# Jamie wants the DisplayName and email address for all "humans" in the '[IT ALL IT]' group
+# How many distribution lists have 10 or fewer members?
+# How many people in Active Directory are from 'Powell','Grove City','Gahanna','Dublin'?
 
 # Questions?
