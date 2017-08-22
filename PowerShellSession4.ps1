@@ -3,4 +3,5 @@
     Regular expressions
     Scripting (will be a multi-class session)
     Profiles
+    VSCode
 #>
