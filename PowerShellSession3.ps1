@@ -29,33 +29,39 @@ Get-ADGroup ITSecurity
 
 # Lets get more info!
 # PowerShell by default returns a small subset of attributes
-Get-ADUser kast04 -Properties *
+Get-ADUser kast04
 
+# What is available to me?
+Get-ADUser kast04  -Properties *
+
+# Add a few specific attributes
 Get-ADUser kast04 -Properties LastBadPasswordAttempt, LastLogonDate, PasswordLastSet
 
+# Look at specifically what I want
 Get-ADUser kast04 -Properties LastBadPasswordAttempt, LastLogonDate, PasswordLastSet |
 Select-Object Name, LastBadPasswordAttempt, LastLogonDate, PasswordLastSet
 
 ########################################################################################
 # Filtering
-Get-ADUser -Filter {samaccountname -like 'stah0*'} |
-Select-Object Name, samaccountname
 
+# single filter
+Get-ADUser -Filter {samaccountname -like 'stah0*'} | Select-Object Name, samaccountname
+
+# multiple filter
 Get-ADUser -Filter {surname -like 'stah*' -AND samaccountname -like 'stah0*'} |
 Select-Object Name, samaccountname
 
+# multiple filter with an additional attribute
 Get-ADUser -Filter {Department -eq 'Data Security (92274)'} -Properties DisplayName |
 Select-Object SamAccountName, DisplayName
 
-# LDAPFilter (Old school)
+# LDAPFilter (Old school, LDIFDE, LDP, CSVDE)
 $LDAP = "(&(Description=*test account*)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))"
-Get-ADUser -LDAPFilter $ldap |
-Select-Object Name, samaccountname, enabled
+Get-ADUser -LDAPFilter $ldap | Select-Object Name, samaccountname, enabled
 
 # Sometimes you can't use the filter parameter (or being lazy).
-Get-ADUser -Filter * |
-Where-Object enabled -eq $false |
-Measure-Command
+Get-ADUser -Filter * -SearchBase 'OU=Disabled,DC=OSUMC,DC=EDU' |
+Where-Object enabled -eq $true | Measure-Object
 
 # Better example (Getting "human users")
 $regex = '^[a-z]{4}\d{2}$|^[a-z]{3}\d{2,3}$|^[a-z]{2}\d{2,4}$'
@@ -71,13 +77,10 @@ Select-Object SamAccountName, Name
 ########################################################################################
 # Sorting, Grouping and Exporting
 Get-ADComputer -filter * -SearchBase 'OU=Citrix,DC=OSUMC,DC=EDU' |
-Sort-Object Name |
-Select-Object Name
+Sort-Object Name | Select-Object Name
 
 Get-ADComputer -filter * -SearchBase 'OU=Citrix,DC=OSUMC,DC=EDU' -properties OperatingSystem |
-Sort-Object Name |
-Select-Object Name, OperatingSystem |
-Export-Csv -Path C:\TEMP\Citrix.csv -NoTypeInformation
+Sort-Object Name | Select-Object Name, OperatingSystem | Export-Csv -Path C:\TEMP\Citrix.csv -NoTypeInformation
 
 # Sort all computer objects in AD by OS count
 Get-ADComputer -Filter * -Properties OperatingSystem |
@@ -105,8 +108,7 @@ Out-GridView -Title "Groups that Brett has, that Wes doesnt"
 
 # Get empty groups
 Get-ADGroup -Filter {GroupCategory -eq 'Distribution'} -Properties members, description, managedby |
-Where-Object {-not $_.Members} |
-Select-Object Name, samAccountName, Description, managedby |
+Where-Object {-not $_.Members} | Select-Object Name, samAccountName, Description, managedby |
 Out-GridView -Title "These be empty groups"
 
 # filtering with a text file of IP addresses
@@ -116,10 +118,7 @@ Get-Content C:\TEMP\ip.txt | ForEach-Object {
 }
 
 # filtering via email address
-Get-Content -Path C:\TEMP\mail.txt |
-ForEach-Object {
-    Get-ADuser -Filter {mail -eq $psitem}
-}
+Get-Content -Path C:\TEMP\mail.txt | ForEach-Object {Get-ADuser -Filter {mail -eq $psitem}}
 
 # Tricky one.....
 # Getting last bad password date (Will explain during session)
@@ -158,9 +157,7 @@ $regex = '^[a-z]{4}\d{2}$|^[a-z]{3}\d{2,3}$|^[a-z]{2}\d{2,4}$'
 $group = 'lsa-ii-nilcv-vp02'
 
 ((Get-ADGroup $group -Properties members).members | Get-ADGroup -Properties members).members |
-    Get-ADUser |
-    Where-Object samaccountname -Match $regex |
-    Select-Object samaccountname
+    Get-ADUser | Where-Object samaccountname -Match $regex | Select-Object samaccountname
 
 # Bonus tip
 # Get-Clipboard example
