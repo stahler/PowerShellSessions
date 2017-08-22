@@ -166,13 +166,9 @@ $group = 'lsa-ii-nilcv-vp02'
 # Bonus tip
 # Get-Clipboard example
 
-<<<<<<< HEAD
 # Test time:
 # Jamie wants the DisplayName and email address for all "humans" in the '[IT ALL IT]' group
 # How many distribution lists have 10 or fewer members?
 # How many people in Active Directory are from 'Powell','Grove City','Gahanna','Dublin'?
 
-# Questions?
-=======
 # Questions, comments, concerns?
->>>>>>> da4ee652f10fdc1b72a1f9c2ac4c62821c5c0512
