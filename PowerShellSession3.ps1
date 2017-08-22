@@ -17,6 +17,12 @@ Get-Command -Module ActiveDirectory -Noun ADUser
 # Notice that you only get a few attributes?
 Get-ADUser kast04
 Get-ADUser kast04
+
+Import-Csv -Path ./itsecurity.csv |
+Select-Object -ExpandProperty samAccountName |
+Get-ADUser # or (I typically do it this way)
+(Import-Csv ./itsecurity.csv).samAccountName | Get-ADUser
+
 Get-ADComputer 'SEC-SCRIPT-VT01'
 Get-Content ./servers.txt | Get-ADComputer
 Get-ADGroup ITSecurity
