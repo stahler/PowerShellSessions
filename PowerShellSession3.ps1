@@ -16,7 +16,9 @@ Get-Command -Module ActiveDirectory -Noun ADUser
 # Start off with some simple Gets (Sets will come later)
 # Notice that you only get a few attributes?
 Get-ADUser kast04
-Get-ADComputer SEC-SCRIPT-VT01
+Get-ADUser kast04
+Get-ADComputer 'SEC-SCRIPT-VT01'
+Get-Content ./servers.txt | Get-ADComputer
 Get-ADGroup ITSecurity
 'Network Team','Office for Scholarship' | Get-ADGroup
 

@@ -1,0 +1,3 @@
+sec-script-vt01
+sec-ef-vp01
+sec-syslog-vp01
