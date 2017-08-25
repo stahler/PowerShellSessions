@@ -60,8 +60,8 @@ $LDAP = "(&(Description=*test account*)(!(userAccountControl:1.2.840.113556.1.4.
 Get-ADUser -LDAPFilter $ldap | Select-Object Name, samaccountname, enabled
 
 # Sometimes you can't use the filter parameter (or being lazy).
-Get-ADUser -Filter * -SearchBase 'OU=Disabled,DC=OSUMC,DC=EDU' |
-Where-Object enabled -eq $true | Measure-Object
+Get-ADUser -Filter {Enabled -eq $false} -SearchBase 'OU=Disabled,DC=OSUMC,DC=EDU' |
+Where-Object surname -in 'Smith','Williams' | Measure-Object
 
 # Better example (Getting "human users")
 $regex = '^[a-z]{4}\d{2}$|^[a-z]{3}\d{2,3}$|^[a-z]{2}\d{2,4}$'
@@ -117,8 +117,8 @@ Out-GridView -Title "These be empty groups"
 
 # filtering with a text file of IP addresses
 Get-Content C:\TEMP\ip.txt | ForEach-Object {
-        Get-ADComputer -Filter {ipv4address -eq $_} -Properties Operatingsystem |
-        Select-Object Name, Operatingsystem
+        Get-ADComputer -Filter {ipv4address -eq $_} -Properties Operatingsystem, ManagedBy |
+        Select-Object Name, Operatingsystem, ManagedBy
 }
 
 # filtering via email address
@@ -170,5 +170,7 @@ $group = 'lsa-ii-nilcv-vp02'
 # Jamie wants the DisplayName and email address for all "humans" in the '[IT ALL IT]' group
 # How many distribution lists have 10 or fewer members?
 # How many people in Active Directory are from 'Powell','Grove City','Gahanna','Dublin'?
+# How many disabled users, but not in disabled OU?
+# How many enabled users in disabled OU
 
 # Questions, comments, concerns?
