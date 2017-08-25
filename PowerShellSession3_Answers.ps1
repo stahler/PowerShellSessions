@@ -1,8 +1,8 @@
 # Answer 1
 $regex = '^[a-z]{4}\d{2}$|^[a-z]{3}\d{2,3}$|^[a-z]{2}\d{2,4}$'
 (Get-ADGroup -filter {name -eq '[IT ALL IT]'} -Properties members).members |
-    Get-ADUser -Properties mail | Where-Object samaccountname -Match $regex |
-    Select-Object samaccountname, mail
+    Get-ADUser -Properties mail,displayname | Where-Object samaccountname -Match $regex |
+    Select-Object samaccountname, mail, displayname
 
 # Answer 2
 Get-ADGroup -Filter {GroupCategory -eq 'Distribution'} -Properties members |

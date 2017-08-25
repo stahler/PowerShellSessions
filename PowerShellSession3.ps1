@@ -64,12 +64,14 @@ Get-ADUser -Filter {Enabled -eq $false} -SearchBase 'OU=Disabled,DC=OSUMC,DC=EDU
 Where-Object surname -in 'Smith','Williams' | Measure-Object
 
 # Better example (Getting "human users")
-$regex = '^[a-z]{4}\d{2}$|^[a-z]{3}\d{2,3}$|^[a-z]{2}\d{2,4}$'
+
+
 Get-ADUser -Filter * |
 Where-Object samaccountname -Match $regex |
 Select-Object samaccountname, name
 
 # Another example finding all non-human users but this time, just looking in a particular OU
+$regex = '^[a-z]{4}\d{2}$|^[a-z]{3}\d{2,3}$|^[a-z]{2}\d{2,4}$'
 Get-ADUser -Filter * -SearchBase 'OU=Disabled,DC=OSUMC,DC=EDU' |
 Where-Object SamAccountName -notmatch $regex |
 Select-Object SamAccountName, Name
@@ -77,10 +79,12 @@ Select-Object SamAccountName, Name
 ########################################################################################
 # Sorting, Grouping and Exporting
 Get-ADComputer -filter * -SearchBase 'OU=Citrix,DC=OSUMC,DC=EDU' |
-Sort-Object Name | Select-Object Name
+Sort-Object Name | Select-Object Name | Out-GridView
 
 Get-ADComputer -filter * -SearchBase 'OU=Citrix,DC=OSUMC,DC=EDU' -properties OperatingSystem |
-Sort-Object Name | Select-Object Name, OperatingSystem | Export-Csv -Path C:\TEMP\Citrix.csv -NoTypeInformation
+    Sort-Object Name |
+    Select-Object Name, OperatingSystem |
+Export-Csv -Path C:\TEMP\Citrix.csv -NoTypeInformation
 
 # Sort all computer objects in AD by OS count
 Get-ADComputer -Filter * -Properties OperatingSystem |
@@ -95,7 +99,7 @@ Search-ADAccount -PasswordExpired -UsersOnly -Credential 'osumc\adm-wes'
 
 ########################################################################################
 # Other common examples
-# Get Groups that are sam for two users
+# Get Groups that are same for two users
 $user1 = (Get-ADPrincipalGroupMembership gard26 | Sort-Object samAccountName).SamAccountName
 $user2 = (Get-ADPrincipalGroupMembership stah06 | Sort-Object samAccountName).SamAccountName
 Compare-Object $user1 $user2 -ExcludeDifferent -IncludeEqual
@@ -122,7 +126,9 @@ Get-Content C:\TEMP\ip.txt | ForEach-Object {
 }
 
 # filtering via email address
-Get-Content -Path C:\TEMP\mail.txt | ForEach-Object {Get-ADuser -Filter {mail -eq $psitem}}
+Get-Content -Path C:\TEMP\mail.txt | ForEach-Object {
+    Get-ADuser -Filter {mail -eq $psitem}
+}
 
 # Tricky one.....
 # Getting last bad password date (Will explain during session)
@@ -153,7 +159,7 @@ Select-Object @{ N = ”OpertaingSystem”; E = { $_.Name } }, Count,
        Out-GridView
 
 ###################################################################################################
-# Looking for mortal accounts that have are in the local adminstrators group
+# Looking for mortal accounts that are in the local adminstrators group
 # Regex to find "human" non-elevated accounts
 $regex = '^[a-z]{4}\d{2}$|^[a-z]{3}\d{2,3}$|^[a-z]{2}\d{2,4}$'
 
