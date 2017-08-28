@@ -22,8 +22,7 @@ Get-ADUser -Filter * -Properties City | Where-Object City -in $city | Measure-Ob
 $regex = '^[a-z]{4}\d{2}$|^[a-z]{3}\d{2,3}$|^[a-z]{2}\d{2,4}$'
 Search-ADAccount -AccountDisabled –UsersOnly |
     Where-Object DistinguishedName -NotLike '*OU=Disabled,DC=OSUMC,DC=EDU' |
-    Where-Object samaccountname -Match $regex |
-Select-Object samaccountname, DistinguishedName
+    Where-Object samaccountname -Match $regex | Measure-Object #Select-Object samaccountname, DistinguishedName
 
 # Answer 4.1 Enabled in Disabled OU
 Get-ADUser -Filter {enabled -eq $true} | Where-Object DistinguishedName -Like '*OU=Disabled,DC=OSUMC,DC=EDU' |
